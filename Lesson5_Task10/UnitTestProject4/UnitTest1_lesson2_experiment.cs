@@ -1229,21 +1229,95 @@ namespace UnitTestProject4_lesson5
         [SetUp]
         public void Start()
         {
-            Console.Write("Point 1.1. has reached; ");   // отладка
+            Console.Write(" Point 1.1. has reached; ");   // отладка
+            //driver = new ChromeDriver();  // временно отключено
+            //wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
+            //driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
+            Console.Write(" Point 1.2. has reached; ");    // отладка
+        }
+
+        public void StartChrome()
+        {
+            Console.Write(" Point 1.1. has reached; ");   // отладка
+            Console.Write(" Chrome driver; ");   // отладка
             driver = new ChromeDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
+            Console.Write(" Point 1.2. has reached; ");    // отладка
+        }
+
+        public void StartFireFox()
+        {
+            Console.Write(" Point 1.1. has reached; ");   // отладка
+            Console.Write(" FireFoх driver; ");   // отладка
+            driver = new FirefoxDriver();
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
             Console.Write("Point 1.2. has reached; ");    // отладка
         }
 
-        [Test]
-        public void Run5Checks()    // основной тест
+        public void StartIE()
         {
-            Console.Write("Point 2.1. has reached; ");   // отладка
+            Console.Write(" Point 1.1. has reached; ");   // отладка
+            Console.Write(" IE driver; ");   // отладка
+            driver = new InternetExplorerDriver(); 
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
+            Console.Write(" Point 1.2. has reached; ");    // отладка
+        }
+
+        public void StartEdge()
+        {
+            Console.Write(" Point 1.1. has reached; ");   // отладка
+            Console.Write(" Edge driver; ");   // отладка
+            driver = new EdgeDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
+            Console.Write(" Point 1.2. has reached; ");    // отладка
+        }
+
+        [Test]
+        public void Run5Checks_Chrome()    // основной тест
+        {
+            Console.Write(" Point 2.1. has reached; ");   // отладка
             //LoginShop();            // вход в магазин  (просто открытие страницы магазина)
+            StartChrome();
             ExecuteRoutineT10();     // основные шаги тестового задания 
             //LogoutShop();         // выход из магазина - в задании 10 не требуется
-            Console.Write("Point 2.2. has reached; ");   // отладка
+            Console.Write(" Point 2.2. has reached; ");   // отладка
+        }
+
+        [Test]
+        public void Run5Checks_FireFox()    // основной тест
+        {
+            Console.Write(" Point 2.1. has reached; ");   // отладка
+            //LoginShop();            // вход в магазин  (просто открытие страницы магазина)
+            StartFireFox();
+            ExecuteRoutineT10();     // основные шаги тестового задания 
+            //LogoutShop();         // выход из магазина - в задании 10 не требуется
+            Console.Write(" Point 2.2. has reached; ");   // отладка
+        }
+
+        [Test]
+        public void Run5Checks_IE()    // основной тест
+        {
+            Console.Write(" Point 2.1. has reached; ");   // отладка
+            //LoginShop();            // вход в магазин  (просто открытие страницы магазина)
+            StartIE();
+            ExecuteRoutineT10();     // основные шаги тестового задания 
+            //LogoutShop();         // выход из магазина - в задании 10 не требуется
+            Console.Write(" Point 2.2. has reached; ");   // отладка
+        }
+
+        [Test]
+        public void Run5Checks_Edge()    // основной тест
+        {
+            //LoginShop();            // вход в магазин  (просто открытие страницы магазина)
+            Console.Write(" Point 2.1. has reached; ");   // отладка
+            StartEdge();
+            ExecuteRoutineT10();     // основные шаги тестового задания 
+            //LogoutShop();         // выход из магазина - в задании 10 не требуется
+            Console.Write(" Point 2.2. has reached; ");   // отладка
         }
 
         public void ExecuteRoutineT10()    // основной тест Задания 10 
