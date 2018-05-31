@@ -871,7 +871,7 @@ namespace UnitTestProject4_lesson4
 namespace UnitTestProject4_lesson5
 {
     [TestFixture]
-    public class UnitTest1_lesson5_Task9         // учебное задание 9, Проверить сортировку стран и геозон в админке 
+    public class UnitTest1_lesson5_Task09         // учебное задание 9, Проверить сортировку стран и геозон в админке 
      
 
     {
@@ -1220,7 +1220,7 @@ namespace UnitTestProject4_lesson5
 
     [TestFixture]
     public class UnitTest1_lesson5_Task10        // учебное задание 10, Проверить товар в магазине 
-        
+
     {
         private IWebDriver driver;
         private WebDriverWait wait;
@@ -1237,12 +1237,12 @@ namespace UnitTestProject4_lesson5
         }
 
         [Test]
-        public void CheckCountriesAndGezones()    // основной тест
+        public void Run5Checks()    // основной тест
         {
             Console.Write("Point 2.1. has reached; ");   // отладка
-            LoginShop();            // вход в магазин  (просто открытие страницы магазина)
+            //LoginShop();            // вход в магазин  (просто открытие страницы магазина)
             ExecuteRoutineT10();     // основные шаги тестового задания 
-            LogoutShop();         // выход из магазина - в задании 8 не требуется
+            //LogoutShop();         // выход из магазина - в задании 10 не требуется
             Console.Write("Point 2.2. has reached; ");   // отладка
         }
 
@@ -1266,89 +1266,232 @@ namespace UnitTestProject4_lesson5
             bool CheckE = false;
 
             const string StoreURL = "http://localhost/litecart/en/"; // главная страница магазина
-            driver.Url = StoreURL; // переход на страницу со списком стран
 
             // ----- CheckA
-            // выбрать первый товар в блоке Campaigns и проверить следующее:
-            // a) на главной странице и на странице товара совпадает текст названия товара
-          
-            string loc1 = "#box-campaigns div.name"; // локатор названия на главной странице 
-            IWebElement DuckPrice1 = driver.FindElements(By.CssSelector(loc1)); // получаем элемент, содержащий ценник
-            string Nam1 = DuckPrice1.GetAttribute("innerText");
+            {   // выбрать первый товар в блоке Campaigns и проверить следующее:
+                // a) на главной странице и на странице товара совпадает текст названия товара
+                driver.Url = StoreURL; // переход на главную страницу 
 
-            Console.Write(' Nam1 = ' + Nam1 +"; "); //  отладка
+                string loc1 = "#box-campaigns div.name"; // локатор названия на главной странице 
+                IWebElement DuckPrice1 = driver.FindElement(By.CssSelector(loc1)); // получаем элемент, содержащий ценник
+                string Nam1 = DuckPrice1.GetAttribute("innerText");
 
-            string DuckURLlocator = "#box-campaigns > div > ul > li > a.link"; // локатор для поиска ссылки на страницу товара
-            string DuckURL = driver.FindElements(By.CssSelector(DuckURLlocator)).GetAttribute("href"); // получаем URL
+                Console.Write(" Nam1 = " + Nam1 + "; "); //  отладка
 
-            Console.Write(' DuckURL = ' + DuckURL + "; "); //  отладка
+                string DuckURLlocator = "#box-campaigns > div > ul > li > a.link"; // локатор для поиска ссылки на страницу товара
+                string DuckURL = driver.FindElement(By.CssSelector(DuckURLlocator)).GetAttribute("href"); // получаем URL
 
-            driver.Url = DuckURL;   // переход на страницу товара
+                //Console.Write(" DuckURL = " + DuckURL + "; "); //  отладка
 
+                driver.Url = DuckURL;   // переход на страницу товара
 
-            string loc2 = "";// локатор названия на странице товара странице 
+                string loc2 = "#box-product > div:nth-child(1) > h1"; // локатор названия на странице товара
+                IWebElement DuckPrice2 = driver.FindElement(By.CssSelector(loc2)); // получаем элемент, содержащий ценник
+                string Nam2 = DuckPrice2.GetAttribute("innerText");
+                Console.Write(" Nam2 = " + Nam2 + "; "); //  отладка
+
+                if (Nam1 == Nam2) { CheckA = true; }       // первая проверка из учебного задания
+                Console.Write(" CheckA = " + CheckA.ToString() + "; "); //  отладка
+            }
 
             // ----- CheckB
+            {   // выбрать первый товар в блоке Campaigns и проверить следующее:
+                // b) на главной странице и на странице товара совпадают цены(обычная и акционная)
+                bool CheckB1 = false;   // признак проверки на первой странице - обычная цена
+                bool CheckB2 = false;   // признак проверки на второй странице - акционная цена
 
-            //const string GoodLocator = "#box-campaigns strong.campaign-pricek";       // локатор для цены
+                driver.Url = StoreURL; // переход на главную страницу 
+                string loc3a = "#box-campaigns s.regular-price"; // локатор для обычной цены 1 стр
+                string loc3b = "#box-campaigns strong.campaign-price"; // локатор для акционной цены 1 стр
+
+                string Price1a = driver.FindElement(By.CssSelector(loc3a)).GetAttribute("innerText"); // получаем ценник с главной страницы 
+                string Price1b = driver.FindElement(By.CssSelector(loc3b)).GetAttribute("innerText"); // получаем ценник с главной страницы 
+
+                Console.Write(" Price1a = " + Price1a + "; "); //  отладка
+                Console.Write(" Price1b = " + Price1b + "; "); //  отладка
+
+                string DuckURLlocator = "#box-campaigns > div > ul > li > a.link"; // локатор для поиска ссылки на страницу товара
+                string DuckURL = driver.FindElement(By.CssSelector(DuckURLlocator)).GetAttribute("href"); // получаем URL
+                driver.Url = DuckURL;  // переход на страницу товара.
+
+                string loc4a = "#box-product s.regular-price"; // локатор для обычной  цены 2 стр
+                string loc4b = "#box-product strong.campaign-price"; // локатор для акционной  цены 2 стр
+
+                string Price2a = driver.FindElement(By.CssSelector(loc4a)).GetAttribute("innerText"); // получаем ценник со страницы товара
+                string Price2b = driver.FindElement(By.CssSelector(loc4b)).GetAttribute("innerText"); // получаем ценник со страницы товара
+
+                Console.Write(" Price2a = " + Price2a + "; "); //  отладка
+                Console.Write(" Price2b = " + Price2b + "; "); //  отладка
+
+                if (Price1a == Price2a) { CheckB1 = true; }       // совпадает обычная цена
+                if (Price1b == Price2b) { CheckB2 = true; }       // совпадает акционноая цена
+                CheckB = CheckB1 & CheckB2;
+                Console.Write(" CheckB = " + CheckB.ToString() + "; "); //  отладка
+
+                //const string GoodLocator = "#box-campaigns strong.campaign-pricek";       // локатор для цены
+            }
 
             // ----- CheckC
+            {   // открыть главную страницу, выбрать первый товар в блоке Campaigns и проверить следующее:
+                // c) обычная цена зачёркнутая и серая(можно считать, что "серый" цвет это такой, у которого в RGBa представлении одинаковые значения для каналов R, G и B)
+                driver.Url = StoreURL; // переход на главную страницу 
+                string loc5 = "#box-campaigns s.regular-price"; // локатор для обычной цены
+                IWebElement DuckPriceElement = driver.FindElement(By.CssSelector(loc5));
+                string Text5 = DuckPriceElement.GetAttribute("innerText");  // получаем ценник с главной страницы 
+                string Color5 = DuckPriceElement.GetCssValue("color");      // получаем ценник с главной страницы 
+
+                //Console.Write(" Text5 = " + Text5 + "; "); //  отладка
+                Console.Write(" Color5 = " + Color5 + "; "); //  отладка
+
+                if (IsGrey(Color5)) { CheckC = true; }; // проверка из учебного задания
+
+                Console.Write(" CheckC = " + CheckC.ToString() + "; "); //  отладка
+            }
 
             // ----- CheckD
+            { // открыть главную страницу, выбрать первый товар в блоке Campaigns и проверить следующее:
+              // d) акционная жирная и красная(можно считать, что "красный" цвет это такой, у которого в RGBa представлении каналы G и B имеют нулевые значения)
+              // (цвета надо проверить на каждой странице независимо, при этом цвета на разных страницах могут не совпадать)
+                bool CheckD1 = false;   // признак проверки на первой странице
+                bool CheckD2 = false;   // признак проверки на второй странице
+                driver.Url = StoreURL; // переход на главную страницу 
+
+                string loc6 = "#box-campaigns strong.campaign-price"; // локатор для акционной цены на первой странице
+                IWebElement DuckPriceElement = driver.FindElement(By.CssSelector(loc6));
+                string Text6 = DuckPriceElement.GetAttribute("innerText");  // получаем ценник с главной страницы 
+                string Color6 = DuckPriceElement.GetCssValue("color");      // получаем ценник с главной страницы 
+
+                //Console.Write(" Text6 = " + Text6 + "; "); //  отладка
+                Console.Write(" Color6 = " + Color6 + "; "); //  отладка
+
+                if (IsRed(Color6)) { CheckD1 = true; }; // проверка из учебного задания
+
+                string DuckURLlocator = "#box-campaigns > div > ul > li > a.link"; // локатор для поиска ссылки на страницу товара
+                string DuckURL = driver.FindElement(By.CssSelector(DuckURLlocator)).GetAttribute("href"); // получаем URL
+                driver.Url = DuckURL;  // переход на страницу товара.
+
+                string loc7 = "#box-product strong.campaign-price"; // локатор для акционной цены на второй странице
+                IWebElement DuckPriceElement2 = driver.FindElement(By.CssSelector(loc7));
+                string Text7 = DuckPriceElement2.GetAttribute("innerText");  // получаем ценник с главной страницы 
+                string Color7 = DuckPriceElement2.GetCssValue("color");      // получаем ценник с главной страницы 
+
+                //Console.Write(" Text7 = " + Text7 + "; "); //  отладка
+                Console.Write(" Color7 = " + Color7 + "; "); //  отладка
+
+                if (IsRed(Color7)) { CheckD2 = true; }; // проверка из учебного задания
+
+                CheckD = CheckD1 & CheckD2; // для выполнения нужно чтобы два условия выполнялись
+
+                Console.Write(" CheckD = " + CheckC.ToString() + "; "); //  отладка
+            }
 
             // ----- CheckE
+            {// открыть главную страницу, выбрать первый товар в блоке Campaigns и проверить следующее:
+             // e) акционная цена крупнее, чем обычная(это тоже надо проверить на каждой странице независимо)
 
-            // ------------
-            /*
-            const string CountryListLocator = "table tr[class=row]";       // CSS запрос, выдающий список стран (238 шт. в тестовом примере)
+                bool CheckE1 = false;   // признак проверки на первой странице
+                bool CheckE2 = false;   // признак проверки на второй странице
 
-            IList<IWebElement> CountryList;
-            IWebElement OneCountry;    // для итераций в цикле
+               driver.Url = StoreURL; // переход на главную страницу 
 
-            //Console.Write(MainMenuList.ToString()); //OK  отладка
+                string loc8a = "#box-campaigns s.regular-price"; // локатор для обычной цены 1 стр
+                string loc8b = "#box-campaigns strong.campaign-price"; // локатор для акционной цены 1 стр
 
-            CountryList = driver.FindElements(By.CssSelector(CountryListLocator));
+                IWebElement DuckPriceElement1a = driver.FindElement(By.CssSelector(loc8a));
+                IWebElement DuckPriceElement1b = driver.FindElement(By.CssSelector(loc8b));
 
-            int liNumber = CountryList.Count;      // вычисляем число элементов в списке (238 шт). Проверку на их наличие не делаем, т.к. учебное упражнение
+                string Text8a = DuckPriceElement1a.GetAttribute("innerText");  // получаем ценник с главной страницы 
+                string Text8b = DuckPriceElement1b.GetAttribute("innerText");  // получаем ценник с главной страницы 
 
-            string CountryName, CountryNameLocator;                      // для интераций в цикле
-            string CountryNamePrev = ""; // инициализация значением, заведомо первым
-            bool HasAlphabeticalOrder = true;      // проверка упорядочивания по алфавиту
+                Console.Write(" Text8a = " + Text8a + "; "); //  отладка
+                Console.Write(" Text8b = " + Text8b + "; "); //  отладка
 
-            for (int i = 0; i < liNumber; i++)        // проверить, что страны расположены в алфавитном порядке
-            {
-                if (i > 0)   // 1-ю строку с хидерами исключаем
-                {
-                    // конструируем динамический локатор-селектор вида: $$("table tr[class=row]:nth-child(3) td:nth-child(5)") 
-                    CountryNameLocator = "table tr[class=row]:nth-child(" + (i + 1).ToString() + ") td:nth-child(5)";  // вытаскиваем назание страны
-                    OneCountry = driver.FindElement(By.CssSelector(CountryNameLocator));
-                    CountryName = OneCountry.GetAttribute("innerText");
+                System.Drawing.Size Size8a = DuckPriceElement1a.Size; // ToString();  // размер обычной цены
+                System.Drawing.Size Size8b = DuckPriceElement1b.Size;  // размер акционной цены 
+
+                Console.Write(" Size8a = " + Size8a.ToString() + "; "); //  отладка
+                Console.Write(" Size8b = " + Size8b.ToString() + "; "); //  отладка
+
+                if ((Size8a.Width < Size8b.Width) & (Size8a.Height < Size8b.Height)) { CheckE1 = true; };   // проверка по условию задания
 
 
-                    if (!IsAlpphabetical(CountryNamePrev, CountryName)) { HasAlphabeticalOrder = false; }; // можно было использовать CompareTo()
+                string DuckURLlocator = "#box-campaigns > div > ul > li > a.link"; // локатор для поиска ссылки на страницу товара
+                string DuckURL = driver.FindElement(By.CssSelector(DuckURLlocator)).GetAttribute("href"); // получаем URL
+                driver.Url = DuckURL;  // переход на страницу товара.
 
-                    // отладка:
-                    Console.Write(" Country(" + (i + 1).ToString() + ") = " + CountryName + ";");
-                    Console.Write(" HasOrder(" + (i + 1).ToString() + ") -> " + HasAlphabeticalOrder.ToString() + ";");
-                    CountryNamePrev = CountryName;
-                }
+                string loc9a = "#box-product s.regular-price"; // локатор для обычной  цены 2 стр
+                string loc9b = "#box-product strong.campaign-price"; // локатор для акционной  цены 2 стр
+
+                IWebElement DuckPriceElement2a = driver.FindElement(By.CssSelector(loc9a));
+                IWebElement DuckPriceElement2b = driver.FindElement(By.CssSelector(loc9b));
+
+                string Text9a = DuckPriceElement2a.GetAttribute("innerText");  // получаем ценник
+                string Text9b = DuckPriceElement2b.GetAttribute("innerText");  // получаем ценник
+
+                Console.Write(" Text9a = " + Text9a + "; "); //  отладка
+                Console.Write(" Text9b = " + Text9b + "; "); //  отладка
+
+                System.Drawing.Size Size9a = DuckPriceElement2a.Size;  // размер обычной цены
+                System.Drawing.Size Size9b = DuckPriceElement2b.Size;  // размер акционной цены 
+
+                Console.Write(" Size9a = " + Size9a.ToString() + "; "); //  отладка
+                Console.Write(" Size9b = " + Size9b.ToString() + "; "); //  отладка
+
+                if ((Size9a.Width < Size9b.Width) & (Size9a.Height < Size9b.Height)) { CheckE2 = true; };   // проверка по условию задания
+                
+                CheckE = CheckE1 & CheckE2; // для выполнения нужно чтобы два условия выполнялись
+
+                Console.Write(" CheckE = " + CheckE.ToString() + "; "); //  отладка
+
             }
-            if (HasAlphabeticalOrder)       // какая-то проверка на упорядоченность названий стран и соотвествующие действия
+
+            //CheckC = false; // отладка -  принудительное присваивание проверки как не пройденной - для отладки исключений
+            //Console.Write(" CheckC =  FALSE (forced);");
+
+            if (CheckA & CheckB & CheckC & CheckD & CheckE)       //все 5 условий должны быть пройдены успешно
             {
-                Console.Write("ALL COUNTRIES ARE ORDERED CORRECTLY");
+                Console.Write(" ALL 5 CHECKS HAS PASSED CORRECTLY;");
             }
             else
             {
-                Console.Write("PROBLEM WITH COUNTRIES ORDER DETECTED");
+                Console.Write(" PROBLEM WITH  5 CHECKS DETECTED;");
                 throw new AssertFailedException();      // выбрасываем исключение и ломаем тест - он будет красный при выполнении.
             }
-
-            */
 
             Console.Write("Point 6.2. has reached; ");   // отладка
         }
 
-           
+        public bool IsGrey(string RGBstring)        // true если серый, false если нет
+        {
+            string RGB = RGBstring.Trim(new char[] { 'r', 'g', 'b', 'a', '(', ')' }); //удаляем ненужные элементы из подстроки
+            string[] RGBarray = RGB.Split(); // парсим строку RGBstring и выделяем отдельные элементы R,G,B:
+            string R = RGBarray[0].Trim(',');    // удаляем запятые посе парсинга
+            string G = RGBarray[1].Trim(',');    // удаляем запятые посе парсинга
+            string B = RGBarray[2].Trim(',');    // удаляем запятые посе парсинга
+            //  Console.Write("R=" + R + "; "); // отладка
+            //  Console.Write("G=" + G + "; "); // отладка
+            //  Console.Write("B=" + B + "; "); // отладка
+            if (R == G)
+            {
+                   if (R == B) { return true; } else { return false; };
+            }
+            else { return false;};
+        }
+
+        public bool IsRed(string RGBstring)        // true если красный, false если нет
+        {
+            string RGB = RGBstring.Trim(new char[] { 'r', 'g', 'b', 'a', '(', ')' }); //удаляем ненужные элементы из подстроки
+            string[] RGBarray = RGB.Split(); // парсим строку RGBstring и выделяем отдельные элементы R,G,B:
+            string R = RGBarray[0].Trim(',');    // удаляем запятые посе парсинга
+            string G = RGBarray[1].Trim(',');    // удаляем запятые посе парсинга
+            string B = RGBarray[2].Trim(',');    // удаляем запятые посе парсинга
+
+            //  Console.Write("R=" + R + "; "); // отладка
+            //  Console.Write("G=" + G + "; "); // отладка
+            //  Console.Write("B=" + B + "; "); // отладка
+
+            if ((G=="0")&(B=="0")) { return true; } else { return false; };          
+        }
 
         public void LoginShop()    //Вспомогательный метод - логин админом в тестовый магазин, затем логаут
         {
@@ -1384,6 +1527,7 @@ namespace UnitTestProject4_lesson5
         }
 
     }
+
 
 
 }
