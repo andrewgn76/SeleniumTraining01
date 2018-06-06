@@ -2072,8 +2072,11 @@ namespace UnitTestProject4_lesson6
 
             // (G-8) Upload Image
             string locFUpload = "#tab-general input[type='file'][name='new_images[]']"; // локатор меню загрузки файлов
-            string pathToImg = @"C:\Users\SeaRu\source\repos\UnitTestProject4\UnitTestProject4\MeraDuck640x640_fwb.png";   // как-то задаем положение файла. Предполагается что это локальный путь
-                       
+            //string pathToImg = @"C:\Users\SeaRu\source\repos\UnitTestProject4\UnitTestProject4\MeraDuck640x640_fwb.png";   // как-то задаем положение файла. Предполагается что это локальный путь
+            // string pathToImg = Directory.GetCurrentDirectory() + @"\MeraDuck640x640_fwb_LOCAL.png";   // System/Win32
+            string pathToImg = AppDomain.CurrentDomain.BaseDirectory + @"MD640.png"; //локальный путь к проекту (по умолчанию bin/debug)
+            
+
             FileInfo fileInf = new FileInfo(pathToImg);  // затем полный путь к файлу получаем через свойство fileInf.FullName
             string fullpathToImg = fileInf.FullName;  // полный путь к файлу получаем через свойство fileInf.FullName
             Console.Write(" Path:" + fullpathToImg + ";");
@@ -2084,6 +2087,8 @@ namespace UnitTestProject4_lesson6
              eCurr.SendKeys(fullpathToImg);
              //eCurr.Click();   // клик не нужен
              Console.Write(" Image file uploaded from:" + fullpathToImg + ";");
+
+            //throw new AssertFailedException();      //принудительно ломаем тест (отладка)
 
             // (G-9) указание дат
             string locDateFrom = "#tab-general input[type='date'][name=date_valid_from]"; // локаторы для полей ввода дат
@@ -2280,9 +2285,183 @@ namespace UnitTestProject4_lesson6
             return (NameUniq);
         }
 
-        public void pauseMY()
+        public void pauseMY()       // впомогательная пауза
         {
             System.Threading.Thread.Sleep(1000);
+        }
+
+        public void LoginShopAdmin()    //Вспомогательный метод - логин админом в тестовый магазин, затем логаут
+        {
+            Console.Write("Point 4.1. has reached; ");   // отладка
+                                                         // открытие  веб-магазина и логин в него:
+                                                         // driver.Url = "http://localhost/litecart/en/";  // обычный магазин
+            driver.Url = "http://localhost/litecart/admin/login.php"; // открытие админской консоли веб-магазина и логин в него:
+            driver.FindElement(By.Name("username")).SendKeys("admin");
+            driver.FindElement(By.Name("password")).SendKeys("admin");
+            driver.FindElement(By.Name("login")).Click();
+            Console.Write("Point 4.2. has reached; ");   // отладка
+            Console.Write("Login sucessfull; ");   // отладка
+
+        }
+
+        public void LogoutShopAdmin()    //Вспомогательный метод - logout из магазина админ
+        {
+            Console.Write("Point 5.1. has reached; ");   // отладка
+                                                         //  Logout:
+                                                         // driver.FindElement(By.ClassName("fa")).Click();
+            Console.Write("Point 5.2. has reached; ");   // отладка
+            Console.Write("Logout sucessfull; ");   // отладка
+        }
+
+        [TearDown]
+        public void Stop()
+        {
+            Console.Write("Point 3.1. has reached; ");   // отладка
+            driver.Quit();
+            driver = null;
+            Console.Write("Point 3.2. has reached; ");   // отладка
+            Console.Write("Logout sucessfull; ");   // отладка
+        }
+    }
+
+
+}
+
+namespace UnitTestProject4_lesson7
+{
+    [TestFixture]
+    public class UnitTest1_lesson7_Task13         // учебное задание 13, добваление/удаление нового товара в корзину
+    {
+        private IWebDriver driver;
+        private WebDriverWait wait;
+        private const bool ConsoleDebug = true; // признак вывода на консоль для отладки
+
+        [SetUp]
+        public void Start()
+        {
+            Console.Write("Point 1.1. has reached; ");   // отладка
+            driver = new ChromeDriver();    // 
+            // driver = new FirefoxDriver();   //  
+            // driver = new InternetExplorerDriver(); // 
+            // driver = new EdgeDriver(); //
+
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));  // обязательна предыдущая строка
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);  // установка времени ожидания 5 сек
+            Console.Write("Point 1.2. has reached; ");    // отладка
+        }
+
+        [Test]
+        public void AddRemoveGoods()    // запуск теста 
+        {
+            Console.Write("Point 2.1. has reached; ");   // отладка
+            //LoginShopAdmin();            // вход в магазин  (админом)
+            ExecuteRoutineT13();     // основные шаги тестового задания
+            //LogoutShopAdmin();         // выход из магазина 
+            Console.Write("Point 2.2. has reached; ");   // отладка
+        }
+
+        public void ExecuteRoutineT13()    // основной тест 
+        {   // Сделайте сценарий для добавления товаров в корзину и удаления товаров из корзины.
+            // 1) открыть главную страницу
+            // 2а) открыть первый товар из списка
+            // 2б) добавить его в корзину(при этом может случайно добавиться товар, который там уже есть, ничего страшного)
+            // 3) подождать, пока счётчик товаров в корзине обновится
+            // 4) вернуться на главную страницу, повторить предыдущие шаги ещё два раза, чтобы в общей сложности в корзине было 3 единицы товара
+            // 5) открыть корзину(в правом верхнем углу кликнуть по ссылке Checkout)
+            // 6) удалить все товары из корзины один за другим, после каждого удаления подождать, пока внизу обновится таблица
+
+            Console.Write("Point 6.1. has reached; ");
+            // 1) открыть главную страницу
+            // входим в магазин
+            string StoreLink = "http://localhost/litecart/en/";    // линк на главную страницу магазина
+
+            // 4) вернуться на главную страницу, повторить предыдущие шаги ещё два раза, чтобы в общей сложности в корзине было 3 единицы товара
+            for (int j = 1; j <= 3; j++)
+            {
+                if (ConsoleDebug) { Console.Write(" j=" + j.ToString() + ";"); }; //  отладка
+
+                driver.Url = StoreLink;
+                if (ConsoleDebug) { Console.Write(" Store opened;"); }; //  отладка
+
+                IWebElement eCurr; // итератор текущего элемента
+
+
+                // 2а) открыть первый товар из списка
+                string locFirstGood = "#box-most-popular ul li:nth-child(1) > a.link";       //локатор первого элемента
+                eCurr = driver.FindElement(By.CssSelector(locFirstGood));
+                eCurr.Click();
+                if (ConsoleDebug) { Console.Write(" Good clicked;"); }; //  отладка
+
+                // 2б) добавить его в корзину(при этом может случайно добавиться товар, который там уже есть, ничего страшного)
+                string locCartCount = "#cart span.quantity"; //локатор счетчика товаров в корзине. Запоминаем значение 
+                eCurr = driver.FindElement(By.CssSelector(locCartCount));
+                string sCartCountPrev = eCurr.GetAttribute("innerText"); // запоминаем предыдущее значение. В тип int не переводим, т.к. отслеживаем только факт изменения
+                if (ConsoleDebug) { Console.Write(" sCartCountPrev=" + sCartCountPrev + ";"); }; //  отладка
+
+                string locBtnAddToCart = "#box-product button[type=submit][name=add_cart_product]"; // локатор кнопки Add to Cart
+                eCurr = driver.FindElement(By.CssSelector(locBtnAddToCart));
+                eCurr.Click();
+                if (ConsoleDebug) { Console.Write(" AddToCart clicked;"); }; //  отладка
+
+                // 3) подождать, пока счётчик товаров в корзине обновится
+                eCurr = driver.FindElement(By.CssSelector(locCartCount));
+                string valCurr = eCurr.GetAttribute("innerText");
+                if (ConsoleDebug) { Console.Write(" innerText=" + valCurr.ToString() + ";"); }; //  отладка
+
+                bool wr = WaitForAttrValue(locCartCount, "innerText", j.ToString(), 15); // процедура ждет до появления значения переданного атрибута или срабатывания таймауа
+                if (ConsoleDebug) { Console.Write(" Waited to price refresh; wr=" + wr.ToString() + ";"); }; //  отладка
+
+                eCurr = driver.FindElement(By.CssSelector(locCartCount));
+                valCurr = eCurr.GetAttribute("innerText");
+                if (ConsoleDebug) { Console.Write(" innerText=" + valCurr.ToString() + ";"); }; //  отладка
+
+
+               // pauseMY(3); // принудительная пауза на указанное клоичество секунд
+            }
+            if (true) { throw new AssertFailedException(); };      //принудительно ломаем тест
+            
+
+            Console.Write("Point 6.2. has reached; ");   // отладка
+
+        }
+
+        public bool WaitForAttrValue(string locElement, string attr, string val, int timeoutSec ) // процедура ожидания значения атрибута в переданном элементе. True если найденб false если нет
+        {
+            bool wasFound = false;
+            for (int i=0; i< timeoutSec; i++)     // упрощенная версия цикла, засыпаем на 1 сек
+            {
+
+                try
+                {
+                    IWebElement we = driver.FindElement(By.CssSelector(locElement));  // ищем элемент. Если не находим, вылетает исключение
+                    // сюда попадаем если элемент we найден
+                    wasFound = true;
+                    string actualValue = we.GetAttribute(attr);     // поиск значения атрибута
+                    if (ConsoleDebug) { Console.Write(" actualValue(" + i.ToString() + "," + attr + ")=" + actualValue + ";"); }; //  отладка
+
+                    if (actualValue == val)  // ожидаемое значение элемента соотвествует найденному
+                    {
+                        if (ConsoleDebug) { Console.Write(" Expected value found:" + actualValue + ";"); }; //  отладка
+                        return true;
+                    }
+
+                    else
+                    {
+                        System.Threading.Thread.Sleep(1000); // засыпаем на 1 сек                ;       
+                    };
+                }
+                catch (NoSuchElementException e)
+                {
+                    System.Threading.Thread.Sleep(1000); // засыпаем на 1 сек
+                };
+            }
+            if (ConsoleDebug) { Console.Write(" wasFound=" + wasFound + ";"); }; //  отладка
+            return false;  // ожидаемое значение элемента НЕ соотвествует найденному 
+         }
+
+        public void pauseMY(int sec)       // впомогательная пауза
+        {
+            System.Threading.Thread.Sleep(sec*1000);
         }
 
         public void LoginShopAdmin()    //Вспомогательный метод - логин админом в тестовый магазин, затем логаут
